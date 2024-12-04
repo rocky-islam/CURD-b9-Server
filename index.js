@@ -42,7 +42,7 @@ async function run() {
 
     const database = client.db('userDb-b9');
     const usersCollection = database.collection('users')
-
+// send user data
     app.post('/users', async(req, res) =>{
         const user = req.body;
         console.log(user)
@@ -64,6 +64,31 @@ async function run() {
         const query = {_id: new ObjectId(id)};
         const result = await usersCollection.deleteOne(query)
         res.send(result)
+    })
+
+    // update a user
+    app.get('/users/:id', async(req, res) =>{
+        const id = req.params.id;
+        const query = {_id: new ObjectId(id)};
+        const user = await usersCollection.findOne(query);
+        res.send(user)
+    })
+
+    app.put('/users/:id', async(req, res) =>{
+        const id = req.params.id;
+        const user = req.body;
+        console.log(user);
+        // main code for updateOne
+        const filter = {_id: new ObjectId(id)};
+        const options = {upsert: true};
+        const updateUser = {
+            $set: {
+                name: user.name,
+                email: user.email
+            }
+        }
+        const result = await usersCollection.updateOne(filter, updateUser, options);
+        res.send(result);
     })
 
 
